@@ -1,5 +1,4 @@
 require("dotenv").config();
-const User = require("./models/user.model");
 const config = require("./config.json");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
@@ -9,6 +8,9 @@ const cors = require("cors");
 const app = express();
 
 mongoose.connect(config.connectionString);
+
+const User = require("./models/user.model");
+const Note = require("./models/note.model");
 
 app.use(express.json());
 
@@ -54,7 +56,7 @@ app.post("/create-account", async (req, res) => {
   await user.save();
 
   const accessToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
-    expiresIn: "36000m",
+    expiresIn: "1h",
   });
 
   return res.json({
@@ -85,7 +87,7 @@ app.post("/login", async (req, res) => {
   if (userInfo.email == email && userInfo.password == password) {
     const user = { user: userInfo };
     const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
-      expiresIn: "36000m",
+      expiresIn: "1h",
     });
 
     return res.json({
@@ -99,6 +101,40 @@ app.post("/login", async (req, res) => {
       error: true,
       message: "Email or Password is incorrect",
     });
+  }
+});
+
+app.post("/add-note", authenticateToken, async (req, res) => {
+  const { title, content, tags } = req.body;
+  const userId = req.user.userId;
+
+  if (!title) {
+    return res.status(400).json({ error: "Title is required" });
+  }
+
+  if (!content) {
+    return res.status(400).json({ error: "Content is required" });
+  }
+
+  try {
+    const note = new Note({
+      title,
+      content,
+      tags: tags || [],
+      userId: userId,
+    });
+
+    await note.save();
+
+    return res.json({
+      error: false,
+      note,
+      message: "Note saved successfully",
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ error: true, message: "Internal Server Error" });
   }
 });
 
