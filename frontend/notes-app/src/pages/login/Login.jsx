@@ -6,15 +6,16 @@ import { validateEmail } from "../../utils/helper";
 import axiosInstance from "../../utils/axiosInstance";
 
 const Login = () => {
-  const [password, setPassword] = useState("");
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!validateEmail(email)) {
+    if (!validateEmail(email.trim())) {
       setError("Please enter a valid email");
       return;
     }
@@ -24,15 +25,19 @@ const Login = () => {
       return;
     }
     setError(null);
+    setIsLoading(true);
 
     try {
       const response = await axiosInstance.post("/login", {
-        email: email,
+        email: email.trim(),
         password: password,
       });
+      console.log("Server response:", response.data);
       if (response.data && response.data.accessToken) {
         localStorage.setItem("token", response.data.accessToken);
         navigate("/dashboard");
+      } else {
+        setError("Email or password incorrect");
       }
     } catch (error) {
       if (
@@ -40,10 +45,12 @@ const Login = () => {
         error.response.data &&
         error.response.data.accessToken
       ) {
-        setError(error.response.data.message);
+        setError(error.response.data.message || "Invalid credentials");
       } else {
         setError("An unexpected error occurred. Please try again");
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -67,8 +74,8 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             {error && <p className="text-red-500 text-xs pb-1">{error}</p>}
-            <button type="submit" className="btn-primary">
-              Login
+            <button type="submit" className="btn-primary" disabled={isLoading}>
+              {isLoading ? "Logging in..." : "Login"}
             </button>
             <p className="text-sm text-center mt-4">
               Not registered yet?{" "}

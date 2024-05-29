@@ -1,16 +1,18 @@
 import { useState } from "react";
 import PasswordInput from "../../components/input/PasswordInput";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { validateEmail } from "../../utils/helper";
 import Navbar from "../../components/navbar/Navbar";
+import axiosInstance from "../../utils/axiosInstance";
 
 const Signup = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
-  const handleSignUp = (e) => {
+  const handleSignUp = async (e) => {
     e.preventDefault();
 
     if (!name) {
@@ -28,8 +30,34 @@ const Signup = () => {
     }
 
     setError(null);
-    console.log(name, email, password);
+
+    try {
+      const response = await axiosInstance.post("/create-account", {
+        fullName: name,
+        email: email.trim(),
+        password: password,
+      });
+      if (response.data && response.data.error) {
+        setError(response.data.message);
+        return;
+      }
+      if (response.data && response.data.accessToken) {
+        localStorage.setItem("accessToken", response.data.accessToken);
+        navigate("/dashboard");
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.accessToken
+      ) {
+        setError(error.response.data.message || "Invalid credentials");
+      } else {
+        setError("An unexpected error occurred. Please try again");
+      }
+    }
   };
+
   return (
     <>
       <Navbar />
