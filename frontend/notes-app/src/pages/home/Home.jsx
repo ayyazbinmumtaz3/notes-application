@@ -6,6 +6,7 @@ import NoteCard from "../../components/cards/NoteCard";
 import Navbar from "../../components/navbar/Navbar";
 import axiosInstance from "../../utils/axiosInstance";
 import AddEditNote from "./AddEditNote";
+import dayjs from "dayjs";
 
 const Home = () => {
   const [OpenModal, setOpenModal] = useState({
@@ -38,6 +39,7 @@ const Home = () => {
       const response = await axiosInstance.get("/show-all-notes");
       if (response.data && response.data.notes) {
         setAllNotes(response.data.notes);
+        console.log(response.data);
       }
     } catch (error) {
       console.log(error);
@@ -47,7 +49,6 @@ const Home = () => {
   useEffect(() => {
     getAllNotes();
     getUserInfo();
-    return () => {};
   }, []);
 
   return (
@@ -55,18 +56,20 @@ const Home = () => {
       <Navbar userInfo={userInfo} />
       <div className="container mx-auto">
         <div className="grid grid-cols-3 gap-4 mt-8">
-          {allNotes.map((item, index) => {
-            <NoteCard
-              key={item._id}
-              title={item.title}
-              date="27 April, 2024"
-              content={item.content}
-              tags={item.tags}
-              isPinned={item.isPinned}
-              onEdit={() => {}}
-              onDelete={() => {}}
-              onPinNote={() => {}}
-            />;
+          {allNotes.map((item) => {
+            return (
+              <NoteCard
+                key={item._id}
+                title={item.title}
+                date={dayjs(item.createdAt).format("DD MMM YYYY")}
+                content={item.content}
+                tags={item.tags}
+                isPinned={item.isPinned}
+                onEdit={() => {}}
+                onDelete={() => {}}
+                onPinNote={() => {}}
+              />
+            );
           })}
         </div>
       </div>
@@ -91,6 +94,7 @@ const Home = () => {
         appElement={document.getElementById("root")}
       >
         <AddEditNote
+          getAllNotes={getAllNotes}
           type={OpenModal.type}
           data={OpenModal.data}
           onClose={() =>

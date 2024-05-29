@@ -81,7 +81,9 @@ app.post("/login", async (req, res) => {
   const userInfo = await User.findOne({ email: email });
 
   if (!userInfo) {
-    return res.json({ message: "User does not exist" });
+    return res
+      .status(400)
+      .json({ error: true, message: "User does not exist" });
   }
 
   if (userInfo.email == email && userInfo.password == password) {
@@ -180,6 +182,7 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
     if (isPinned) note.isPinned = isPinned;
 
     await note.save();
+
     return res.json({
       error: false,
       note,
