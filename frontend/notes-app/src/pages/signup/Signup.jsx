@@ -1,9 +1,9 @@
 import { useState } from "react";
-import PasswordInput from "../../components/input/PasswordInput";
 import { Link, useNavigate } from "react-router-dom";
-import { validateEmail } from "../../utils/helper";
+import PasswordInput from "../../components/input/PasswordInput";
 import Navbar from "../../components/navbar/Navbar";
 import axiosInstance from "../../utils/axiosInstance";
+import { validateEmail } from "../../utils/helper";
 
 const Signup = () => {
   const [name, setName] = useState("");
@@ -30,6 +30,8 @@ const Signup = () => {
     }
 
     setError(null);
+
+    //create-account
 
     try {
       const response = await axiosInstance.post("/create-account", {

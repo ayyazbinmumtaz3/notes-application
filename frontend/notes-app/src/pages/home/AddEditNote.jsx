@@ -1,16 +1,18 @@
 import { useState } from "react";
-import TagInput from "../../components/input/TagInput";
 import { CloseIcon } from "../../assets/icons";
+import TagInput from "../../components/input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
 
-const AddEditNote = ({ noteData, getAllNotes, type, onClose }) => {
-  const [title, setTitle] = useState(noteData?.title || "");
-  const [content, setContent] = useState(noteData?.content || "");
-  const [tags, setTags] = useState(noteData?.tags || []);
+const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
+  const [title, setTitle] = useState(data?.title || "");
+  const [content, setContent] = useState(data?.content || "");
+  const [tags, setTags] = useState(data?.tags || []);
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   // add notes
   const addNewNote = async () => {
+    setIsLoading(true);
     try {
       //
       const response = await axiosInstance.post("/add-note", {
@@ -30,15 +32,23 @@ const AddEditNote = ({ noteData, getAllNotes, type, onClose }) => {
       ) {
         setError(error.response.data.message);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
   //edit notes
-  const editNote = async (noteData) => {
-    const noteId = noteData._id;
+  const editNote = async (data) => {
+    if (!data || !data._id) {
+      setError("Invalid note data");
+      console.log("Invalid note data");
+      return;
+    }
+    const noteId = data._id;
+    setIsLoading(true);
     try {
       //
-      const response = await axiosInstance.put("/edit-note" + noteId, {
+      const response = await axiosInstance.put(`/edit-note/${noteId}`, {
         title,
         content,
         tags,
@@ -55,6 +65,8 @@ const AddEditNote = ({ noteData, getAllNotes, type, onClose }) => {
       ) {
         setError(error.response.data.message);
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -72,7 +84,7 @@ const AddEditNote = ({ noteData, getAllNotes, type, onClose }) => {
     setError(null);
 
     if (type === "edit") {
-      editNote();
+      editNote(data);
     } else {
       addNewNote();
     }
@@ -120,10 +132,16 @@ const AddEditNote = ({ noteData, getAllNotes, type, onClose }) => {
         className="btn-primary font-medium mt-5 p-3"
         onClick={() => {
           handleAddNote();
-          console.log("Add");
         }}
+        disabled={isLoading}
       >
-        {type === "edit" ? "Update" : "Add"}
+        {type === "edit"
+          ? isLoading
+            ? "Updating..."
+            : "Update"
+          : isLoading
+          ? "Adding..."
+          : "Add"}
       </button>
     </div>
   );

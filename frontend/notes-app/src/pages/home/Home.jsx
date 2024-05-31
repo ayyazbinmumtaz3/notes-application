@@ -1,14 +1,18 @@
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import { AddButton } from "../../assets/icons";
+import EmptyNote from "../../assets/images/EmptyNote.png";
 import NoteCard from "../../components/cards/NoteCard";
+import EmptyCard from "../../components/emptycard/EmptyCard";
 import Navbar from "../../components/navbar/Navbar";
 import axiosInstance from "../../utils/axiosInstance";
 import AddEditNote from "./AddEditNote";
-import dayjs from "dayjs";
 
 const Home = () => {
+  console.log("Home component render");
+
   const [OpenModal, setOpenModal] = useState({
     isShown: false,
     type: "add",
@@ -27,9 +31,11 @@ const Home = () => {
     });
   };
 
+  //get user info
+
   const getUserInfo = async () => {
     try {
-      const response = await axiosInstance.get("/get-user");
+      const response = await axiosInstance.get(`/get-user`);
       if (response.data && response.data.user) {
         setUserInfo(response.data.user);
       }
@@ -41,12 +47,37 @@ const Home = () => {
     }
   };
 
+  // delete note
+
+  const deleteNote = async (data) => {
+    if (!data || !data._id) {
+      console.log("Invalid note data");
+      return;
+    }
+    const noteId = data._id;
+    try {
+      const response = await axiosInstance.delete(`/delete-note/${noteId}`);
+      if (response.data && !response.data.error) {
+        getAllNotes();
+      }
+    } catch (error) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        console.log(error);
+      }
+    }
+  };
+
+  // get all notes
+
   const getAllNotes = async () => {
     try {
-      const response = await axiosInstance.get("/show-all-notes");
+      const response = await axiosInstance.get(`/show-all-notes`);
       if (response.data && response.data.notes) {
         setAllNotes(response.data.notes);
-        console.log(response.data);
       }
     } catch (error) {
       console.log(error);
@@ -62,23 +93,30 @@ const Home = () => {
     <>
       <Navbar userInfo={userInfo} />
       <div className="container mx-auto">
-        <div className="grid grid-cols-3 gap-4 mt-8">
-          {allNotes.map((item) => {
-            return (
-              <NoteCard
-                key={item._id}
-                title={item.title}
-                date={dayjs(item.createdAt).format("DD MMM YYYY")}
-                content={item.content}
-                tags={item.tags}
-                isPinned={item.isPinned}
-                onEdit={() => handleEdit(item)}
-                onDelete={() => {}}
-                onPinNote={() => {}}
-              />
-            );
-          })}
-        </div>
+        {allNotes.length > 0 ? (
+          <div className="grid grid-cols-3 gap-4 mt-8">
+            {allNotes.map((item) => {
+              return (
+                <NoteCard
+                  key={item._id}
+                  title={item.title}
+                  date={dayjs(item.createdAt).format("DD MMM YYYY")}
+                  content={item.content}
+                  tags={item.tags}
+                  isPinned={item.isPinned}
+                  onEdit={() => handleEdit(item)}
+                  onDelete={() => deleteNote(item)}
+                  onPinNote={() => {}}
+                />
+              );
+            })}
+          </div>
+        ) : (
+          <EmptyCard
+            imgSrc={EmptyNote}
+            message={`Start creating your first note! Click the 'Add' button to note down your thoughts, ideas, and reminders. Let's get started!`}
+          />
+        )}
       </div>
       <button
         className="flex w-14 h-14 rounded-2xl text-white bg-primary hover:bg-blue-400 items-center justify-center absolute right-10 bottom-10 hover:shadow-lg"
