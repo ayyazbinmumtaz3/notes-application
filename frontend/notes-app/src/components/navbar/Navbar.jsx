@@ -1,18 +1,34 @@
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProfileInfo from "../cards/ProfileInfo";
 import SearchBar from "../searchbar/SearchBar";
+import debounce from "lodash.debounce";
 
-const Navbar = ({ userInfo }) => {
+const Navbar = ({ userInfo, onSearchNotes }) => {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
-  const handleSearch = () => {};
+  const handleSearch = () => {
+    if (searchQuery) {
+      onSearchNotes && onSearchNotes(searchQuery);
+    }
+  };
+
+  const debounced = useCallback(
+    debounce(() => onSearchNotes(searchQuery), 1000, { trailing: true }),
+    [onSearchNotes, searchQuery]
+  );
+
+  useEffect(() => {
+    if (!searchQuery) {
+      onSearchNotes && onSearchNotes("");
+    }
+  }, [searchQuery]);
 
   const onClearSearch = () => {
     setSearchQuery("");
   };
 
-  const navigate = useNavigate();
   const onLogout = () => {
     localStorage.clear();
     navigate("/login");
@@ -24,6 +40,7 @@ const Navbar = ({ userInfo }) => {
         value={searchQuery}
         onChange={({ target }) => {
           setSearchQuery(target.value);
+          debounced();
         }}
         handleSearch={handleSearch}
         onClearSearch={onClearSearch}

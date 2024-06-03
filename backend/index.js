@@ -195,11 +195,20 @@ app.put("/edit-note/:noteId", authenticateToken, async (req, res) => {
   }
 });
 
-app.get("/show-all-notes", authenticateToken, async (req, res) => {
+app.get("/get-all-notes", authenticateToken, async (req, res) => {
   const userId = req.user.user._id;
+  const { query } = req.query;
 
   try {
-    const notes = await Note.find({ userId: userId }).sort({ isPinned: -1 });
+    const notes = await Note.find({
+      userId: userId,
+      $or: [
+        { title: { $regex: new RegExp(query, "im") } },
+        { content: { $regex: new RegExp(query, "im") } },
+        { tags: { $regex: new RegExp(query, "im") } },
+      ],
+    }).sort({ updatedAt: "desc" });
+
     return res.json({
       error: false,
       notes,
@@ -243,7 +252,7 @@ app.put("/edit-note-pinned/:noteId", authenticateToken, async (req, res) => {
   try {
     const note = await Note.findOne({ _id: noteId, userId: userId });
 
-    if (isPinned) note.isPinned = isPinned || false;
+    note.isPinned = isPinned;
 
     await note.save();
     return res.json({

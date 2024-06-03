@@ -73,11 +73,35 @@ const Home = () => {
 
   // get all notes
 
-  const getAllNotes = async () => {
+  const getAllNotes = async (query = null) => {
     try {
-      const response = await axiosInstance.get(`/show-all-notes`);
+      const response = await axiosInstance.get(`/get-all-notes`, {
+        params: { query },
+      });
+
       if (response.data && response.data.notes) {
         setAllNotes(response.data.notes);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updateIsPinned = async (data) => {
+    if (!data || !data._id) {
+      console.log("Invalid note data");
+      return;
+    }
+    const noteId = data._id;
+
+    console.log({ data });
+
+    try {
+      const response = await axiosInstance.put(`/edit-note-pinned/${noteId}`, {
+        isPinned: !data.isPinned,
+      });
+      if (response.data && response.data.note) {
+        getAllNotes();
       }
     } catch (error) {
       console.log(error);
@@ -91,7 +115,7 @@ const Home = () => {
 
   return (
     <>
-      <Navbar userInfo={userInfo} />
+      <Navbar userInfo={userInfo} onSearchNotes={getAllNotes} />
       <div className="container mx-auto">
         {allNotes.length > 0 ? (
           <div className="grid grid-cols-3 gap-4 mt-8">
@@ -106,7 +130,7 @@ const Home = () => {
                   isPinned={item.isPinned}
                   onEdit={() => handleEdit(item)}
                   onDelete={() => deleteNote(item)}
-                  onPinNote={() => {}}
+                  onPinNote={() => updateIsPinned(item)}
                 />
               );
             })}

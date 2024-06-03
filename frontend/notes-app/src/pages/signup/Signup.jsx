@@ -30,7 +30,6 @@ const Signup = () => {
     }
 
     setError(null);
-
     //create-account
 
     try {
@@ -60,6 +59,12 @@ const Signup = () => {
     }
   };
 
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSignUp();
+    }
+  };
+
   return (
     <>
       <Navbar />
@@ -86,7 +91,11 @@ const Signup = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             {error && <p className="text-red-500 text-xs pb-1">{error}</p>}
-            <button type="submit" className="btn-primary">
+            <button
+              type="submit"
+              className="btn-primary"
+              onKeyDown={handleKeyDown}
+            >
               Create Account
             </button>
             <p className="text-sm text-center mt-4">
