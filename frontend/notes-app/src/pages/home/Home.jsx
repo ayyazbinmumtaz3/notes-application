@@ -13,7 +13,7 @@ import AddEditNote from "./AddEditNote";
 const Home = () => {
   console.log("Home component render");
 
-  const [OpenModal, setOpenModal] = useState({
+  const [OpenEditModal, setOpenEditModal] = useState({
     isShown: false,
     type: "add",
     data: null,
@@ -24,7 +24,7 @@ const Home = () => {
   const [allNotes, setAllNotes] = useState([]);
 
   const handleEdit = (noteDetails) => {
-    setOpenModal({
+    setOpenEditModal({
       isShown: true,
       type: "edit",
       data: noteDetails,
@@ -116,25 +116,56 @@ const Home = () => {
   return (
     <>
       <Navbar userInfo={userInfo} onSearchNotes={getAllNotes} />
-      <div className="container mx-auto">
+      <div className="container mx-auto my-6">
         {allNotes.length > 0 ? (
-          <div className="grid grid-cols-3 gap-4 mt-8">
-            {allNotes.map((item) => {
-              return (
-                <NoteCard
-                  key={item._id}
-                  title={item.title}
-                  date={dayjs(item.createdAt).format("DD MMM YYYY")}
-                  content={item.content}
-                  tags={item.tags}
-                  isPinned={item.isPinned}
-                  onEdit={() => handleEdit(item)}
-                  onDelete={() => deleteNote(item)}
-                  onPinNote={() => updateIsPinned(item)}
-                />
-              );
-            })}
-          </div>
+          <>
+            <h4 className="text-2xl font-medium text-gray-700 mt-6 mb-2">
+              Pinned Notes
+            </h4>
+            <hr />
+            <div className="grid grid-cols-3 gap-4 mt-8">
+              {allNotes
+                .filter((note) => note.isPinned)
+                .map((item) => {
+                  return (
+                    <NoteCard
+                      key={item._id}
+                      title={item.title}
+                      date={dayjs(item.createdAt).format("DD MMM YYYY")}
+                      content={item.content}
+                      tags={item.tags}
+                      isPinned={item.isPinned}
+                      onEdit={() => handleEdit(item)}
+                      onDelete={() => deleteNote(item)}
+                      onPinNote={() => updateIsPinned(item)}
+                    />
+                  );
+                })}
+            </div>
+            <h4 className="text-2xl font-medium text-gray-700 mt-6 mb-2">
+              Notes
+            </h4>
+            <hr />
+            <div className="grid grid-cols-3 gap-4 mt-8">
+              {allNotes
+                .filter((note) => note.isPinned === false)
+                .map((item) => {
+                  return (
+                    <NoteCard
+                      key={item._id}
+                      title={item.title}
+                      date={dayjs(item.createdAt).format("DD MMM YYYY")}
+                      content={item.content}
+                      tags={item.tags}
+                      isPinned={item.isPinned}
+                      onEdit={() => handleEdit(item)}
+                      onDelete={() => deleteNote(item)}
+                      onPinNote={() => updateIsPinned(item)}
+                    />
+                  );
+                })}
+            </div>
+          </>
         ) : (
           <EmptyCard
             imgSrc={EmptyNote}
@@ -143,9 +174,9 @@ const Home = () => {
         )}
       </div>
       <button
-        className="flex w-14 h-14 rounded-2xl text-white bg-primary hover:bg-blue-400 items-center justify-center absolute right-10 bottom-10 hover:shadow-lg"
+        className="flex w-14 h-14 rounded-2xl text-white bg-primary hover:bg-blue-400 items-center justify-center  right-10 bottom-10 fixed hover:shadow-lg"
         onClick={() => {
-          setOpenModal({
+          setOpenEditModal({
             isShown: true,
             type: "add",
             data: null,
@@ -155,7 +186,7 @@ const Home = () => {
         <AddButton />
       </button>
       <Modal
-        isOpen={OpenModal.isShown}
+        isOpen={OpenEditModal.isShown}
         onRequestClose={() => {}}
         style={{ overlay: { backgroundColor: "rgba(0,0,0,0.2)" } }}
         contentLabel=""
@@ -164,10 +195,10 @@ const Home = () => {
       >
         <AddEditNote
           getAllNotes={getAllNotes}
-          type={OpenModal.type}
-          data={OpenModal.data}
+          type={OpenEditModal.type}
+          data={OpenEditModal.data}
           onClose={() =>
-            setOpenModal({ isShown: false, type: "add", data: null })
+            setOpenEditModal({ isShown: false, type: "add", data: null })
           }
         />
       </Modal>
