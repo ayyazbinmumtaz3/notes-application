@@ -6,7 +6,8 @@ import Matter from "matter-js";
 const AnimationComponent = () => {
   const maskStyle = {
     // This mask will start from white at the bottom and fade to transparent at the top
-
+    WebkitMask: `linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)`,
+    mask: `linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%)`,
     position: "absolute",
     left: 0,
     width: "100%",
@@ -55,7 +56,7 @@ const AnimationComponent = () => {
     }).appendTo(document.getElementById("animation-container"));
 
     const solver = Matter.Engine.create();
-    solver.world.gravity.y = 0.7;
+    solver.world.gravity.y = 0.5;
 
     const bounds = {
       length: 5000,
@@ -128,14 +129,17 @@ const AnimationComponent = () => {
 
       let size;
 
+      // Adjust size based on screen width
       if (two.width < 480) {
-        size = two.width * 0.12 * 0.75; // 25% smaller
-      } else if (two.width > 1080 && two.width < 1600) {
-        size = two.width * 0.07 * 0.75; // 25% smaller
-      } else if (two.width > 1600) {
-        size = two.width * 0.06 * 0.75; // 25% smaller
+        size = two.width * 0.12 * 0.75; // 25% smaller for small screens
+      } else if (two.width >= 480 && two.width < 768) {
+        size = two.width * 0.1 * 0.75; // Slightly larger for tablets
+      } else if (two.width >= 768 && two.width < 1080) {
+        size = two.width * 0.08 * 0.75; // Medium screens (e.g., landscape tablets)
+      } else if (two.width >= 1080 && two.width < 1600) {
+        size = two.width * 0.07 * 0.75; // Large screens
       } else {
-        size = two.width * 0.08 * 0.75; // 25% smaller
+        size = two.width * 0.06 * 0.75; // Very large screens
       }
 
       const leading = size * 0.8;
@@ -170,7 +174,10 @@ const AnimationComponent = () => {
       let x = defaultStyles.margin.left;
       let y = -two.height; // Header offset
 
-      for (let i = 0; i < copy.length; i++) {
+      // Limit the loop to create only 20 rectangles
+      const maxRectangles = 23;
+
+      for (let i = 0; i < Math.min(maxRectangles, copy.length); i++) {
         const word = copy[i];
         const group = new Two.Group();
         const text = new Two.Text("", 0, 0, defaultStyles);
@@ -213,13 +220,13 @@ const AnimationComponent = () => {
         ); // 25% smaller
 
         if (i % 2 === 0) {
-          rectangle.fill = "rgba(34, 34, 34, 0.85)"; // Light black color with some transparency
+          rectangle.fill = "rgba(40, 40, 40)"; // Light black color with some transparency
           rectangle.noStroke();
           text.fill = "white";
         } else {
-          rectangle.noFill();
-          rectangle.stroke = "rgba(34, 34, 34, 0.85)";
-          text.fill = "black";
+          rectangle.fill = "rgba(255, 255, 255)";
+          rectangle.stroke = "rgba(45, 45, 45)";
+          text.fill = "rgba(50, 50, 50)";
         }
 
         rectangle.visible = true;
