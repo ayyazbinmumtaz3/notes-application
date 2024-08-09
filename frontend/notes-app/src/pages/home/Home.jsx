@@ -9,10 +9,9 @@ import EmptyCard from "../../components/emptycard/EmptyCard";
 import Navbar from "../../components/navbar/Navbar";
 import axiosInstance from "../../utils/axiosInstance";
 import AddEditNote from "./AddEditNote";
+import AnimationComponent from "../../components/animations/AnimationComponent";
 
 const Home = () => {
-  console.log("Home component render");
-
   const [OpenEditModal, setOpenEditModal] = useState({
     isShown: false,
     type: "add",
@@ -116,65 +115,74 @@ const Home = () => {
   return (
     <>
       <Navbar userInfo={userInfo} onSearchNotes={getAllNotes} />
-      <div className="container mx-auto my-6">
-        {allNotes.length > 0 ? (
-          <>
-            <h4 className="text-2xl font-medium text-gray-700 mt-6 mb-2">
-              Pinned Notes
-            </h4>
-            <hr />
-            <div className="grid grid-cols-3 gap-4 mt-8">
-              {allNotes
-                .filter((note) => note.isPinned)
-                .map((item) => {
-                  return (
-                    <NoteCard
-                      key={item._id}
-                      title={item.title}
-                      date={dayjs(item.createdAt).format("DD MMM YYYY")}
-                      content={item.content}
-                      tags={item.tags}
-                      isPinned={item.isPinned}
-                      onEdit={() => handleEdit(item)}
-                      onDelete={() => deleteNote(item)}
-                      onPinNote={() => updateIsPinned(item)}
-                    />
-                  );
-                })}
-            </div>
-            <h4 className="text-2xl font-medium text-gray-700 mt-6 mb-2">
-              Notes
-            </h4>
-            <hr />
-            <div className="grid grid-cols-3 gap-4 mt-8">
-              {allNotes
-                .filter((note) => note.isPinned === false)
-                .map((item) => {
-                  return (
-                    <NoteCard
-                      key={item._id}
-                      title={item.title}
-                      date={dayjs(item.createdAt).format("DD MMM YYYY")}
-                      content={item.content}
-                      tags={item.tags}
-                      isPinned={item.isPinned}
-                      onEdit={() => handleEdit(item)}
-                      onDelete={() => deleteNote(item)}
-                      onPinNote={() => updateIsPinned(item)}
-                    />
-                  );
-                })}
-            </div>
-          </>
-        ) : (
-          <EmptyCard
-            imgSrc={EmptyNote}
-            message={`Start creating your first note! Click the 'Add' button to note down your thoughts, ideas, and reminders. Let's get started!`}
-          />
-        )}
+      <div className="relative">
+        <div className="container mx-auto my-6">
+          {allNotes.length > 0 ? (
+            <>
+              <h4 className="text-2xl font-medium text-gray-700 mt-6 mb-2">
+                Pinned Notes
+              </h4>
+              <hr />
+              <div className="grid grid-cols-3 gap-4 mt-8">
+                {allNotes
+                  .filter((note) => note.isPinned)
+                  .map((item) => {
+                    return (
+                      <NoteCard
+                        key={item._id}
+                        title={item.title}
+                        date={dayjs(item.createdAt).format(
+                          "MMMM D, YYYY h:mm A"
+                        )}
+                        content={item.content}
+                        tags={item.tags}
+                        isPinned={item.isPinned}
+                        onEdit={() => handleEdit(item)}
+                        onDelete={() => deleteNote(item)}
+                        onPinNote={() => updateIsPinned(item)}
+                      />
+                    );
+                  })}
+              </div>
+              <h4 className="text-2xl font-medium text-gray-700 mt-6 mb-2">
+                Notes
+              </h4>
+              <hr />
+              <div className="grid grid-cols-3 gap-4 mt-8">
+                {allNotes
+                  .filter((note) => note.isPinned === false)
+                  .map((item) => {
+                    return (
+                      <NoteCard
+                        key={item._id}
+                        title={item.title}
+                        date={dayjs(item.createdAt).format(
+                          `MMMM D, YYYY h:mm A`
+                        )}
+                        content={item.content}
+                        tags={item.tags}
+                        isPinned={item.isPinned}
+                        onEdit={() => handleEdit(item)}
+                        onDelete={() => deleteNote(item)}
+                        onPinNote={() => updateIsPinned(item)}
+                      />
+                    );
+                  })}
+              </div>
+            </>
+          ) : (
+            <>
+              <EmptyCard
+                imgSrc={EmptyNote}
+                message={`Start creating your first note! Click the 'Add' button to note down your thoughts, ideas, and reminders. Let's get started!`}
+              />
+              <AnimationComponent />
+            </>
+          )}
+        </div>
       </div>
       <button
-        className="flex w-14 h-14 rounded-2xl text-white bg-primary hover:bg-blue-400 items-center justify-center  right-10 bottom-10 fixed hover:shadow-lg"
+        className="flex w-14 h-14 rounded-2xl text-white bg-primary hover:bg-blue-400 items-center justify-center right-10 bottom-10 fixed hover:shadow-lg z-50"
         onClick={() => {
           setOpenEditModal({
             isShown: true,
@@ -185,12 +193,13 @@ const Home = () => {
       >
         <AddButton />
       </button>
+
       <Modal
         isOpen={OpenEditModal.isShown}
         onRequestClose={() => {}}
         style={{ overlay: { backgroundColor: "rgba(0,0,0,0.2)" } }}
         contentLabel=""
-        className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-16 p-5 overflow-auto"
+        className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-16 p-5 overflow-auto outline-none"
         appElement={document.getElementById("root")}
       >
         <AddEditNote
