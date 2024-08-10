@@ -1,19 +1,23 @@
-import { useCallback, useEffect, useState } from "react";
+import debounce from "lodash.debounce";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import ProfileInfo from "../cards/ProfileInfo";
 import SearchBar from "../searchbar/SearchBar";
-import debounce from "lodash.debounce";
 
 const Navbar = ({ userInfo, onSearchNotes }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const prevSearchQueryRef = useRef(searchQuery);
 
   // Create a debounced function
   const debouncedSearch = useCallback(
     debounce(
       (query) => {
-        console.log("Debounced search for:", query); // Debugging line
-        onSearchNotes(query);
+        if (query !== prevSearchQueryRef.current) {
+          console.log("Debounced search for:", query); // Debugging line
+          onSearchNotes(query);
+          prevSearchQueryRef.current = query;
+        }
       },
       1000,
       { trailing: true }
@@ -21,18 +25,15 @@ const Navbar = ({ userInfo, onSearchNotes }) => {
     [onSearchNotes]
   );
 
-  // useEffect(() => {
-  //   if (searchQuery) {
-  //     debouncedSearch(searchQuery);
-  //   } else {
-  //     // Handle empty search query
-  //     onSearchNotes && onSearchNotes("");
-  //   }
-  // Clean up debounce on unmount
-  //   return () => {
-  //     debouncedSearch.cancel();
-  //   };
-  // }, [searchQuery, debouncedSearch, onSearchNotes]);
+  useEffect(() => {
+    if (searchQuery !== prevSearchQueryRef.current) {
+      debouncedSearch(searchQuery);
+    }
+    // Clean up debounce on unmount
+    return () => {
+      debouncedSearch.cancel();
+    };
+  }, [searchQuery, debouncedSearch]);
 
   const onClearSearch = () => {
     setSearchQuery("");

@@ -112,6 +112,7 @@ const AnimationComponent = () => {
     }
 
     function resize() {
+      console.log("Resize called");
       const length = bounds.length;
       const thickness = bounds.thickness;
 
@@ -165,6 +166,11 @@ const AnimationComponent = () => {
         Matter.Body.scale(entity, 1 / entity.scale.x, 1 / entity.scale.y);
         Matter.Body.scale(entity, rect.width * 0.75, rect.height * 0.75); // 25% smaller
         entity.scale.set(rect.width * 0.75, rect.height * 0.75); // 25% smaller
+
+        Matter.Body.setVelocity(entity, {
+          x: (Math.random() - 0.5) * 10, // Random horizontal speed
+          y: Math.random() * 10 + 5, // Random vertical speed
+        });
 
         text.size = size / 3;
       }
@@ -237,6 +243,7 @@ const AnimationComponent = () => {
         entity.scale = new Two.Vector(rect.width * 0.75, rect.height * 0.75); // 25% smaller
         entity.object = group;
         entities.push(entity);
+        console.log("Entities added:", entities.length);
 
         x +=
           (rect.width +
@@ -256,11 +263,13 @@ const AnimationComponent = () => {
     }
 
     function update(frameCount, timeDelta) {
+      console.log("Update called", { frameCount, timeDelta });
       const allBodies = Matter.Composite.allBodies(solver.world);
       Matter.MouseConstraint.update(mouse, allBodies);
       Matter.MouseConstraint._triggerEvents(mouse);
 
       Matter.Engine.update(solver);
+      console.log("Engine updated");
 
       for (let i = 0; i < entities.length; i++) {
         const entity = entities[i];
@@ -286,6 +295,7 @@ const AnimationComponent = () => {
     }
 
     return () => {
+      console.log("AnimationComponent unmounted");
       two.clear();
       Matter.World.clear(solver.world);
     };
