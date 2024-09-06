@@ -6,6 +6,7 @@ const { authenticateToken } = require("./utilities");
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const { OAuth2Client } = require("google-auth-library");
 
 mongoose.connect(config.connectionString);
 
@@ -20,8 +21,38 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  res.json({ data: "Hello World" });
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+app.post("/google-login", async (req, res) => {
+  const { token, clientId } = req.body;
+  try {
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: clientId,
+    });
+
+    const payload = ticket.getPayload();
+    const googleId = payload["sub"];
+
+    let user = await User.findOne({ googleId });
+
+    if (!user) {
+      user = new User({
+        googleId,
+        email: payload.email,
+        fullName: payload.name,
+      });
+      await user.save();
+    }
+
+    const sessionToken = jwt.sign({ user }, process.env.ACCESS_TOKEN_SECRET, {
+      expiresIn: "1y",
+    });
+    res.json({ user, token: sessionToken });
+  } catch (error) {
+    console.error("Error verifying google token", error);
+    res.status(401).json({ error: "Authentication failed" });
+  }
 });
 
 app.post("/create-account", async (req, res) => {
