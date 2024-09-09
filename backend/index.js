@@ -1,11 +1,12 @@
+const express = require("express");
+const cors = require("cors");
+const app = express();
+const { OpenAI } = require("openai");
 require("dotenv").config();
 const config = require("./config.json");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utilities");
-const express = require("express");
-const cors = require("cors");
-const app = express();
 const { OAuth2Client } = require("google-auth-library");
 
 mongoose.connect(config.connectionString);
@@ -20,6 +21,63 @@ app.use(
     origin: "*",
   })
 );
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
+
+// app.post("/generate-note", authenticateToken, async (req, res) => {
+//   const { prompt } = req.body;
+
+//   if (!prompt) {
+//     return res.status(400).json({ error: "Prompt is required" });
+//   }
+
+//   try {
+//     const completion = await openai.completions.create({
+//       model: "babbage-002",
+//       prompt: prompt,
+//       max_tokens: 100,
+//       temperature: 0.2,
+//     });
+
+//     return res.json({
+//       error: false,
+//       generatedText: completion.choices[0].text.trim(),
+//     });
+//   } catch (error) {
+//     console.error(
+//       "Error generating text:",
+//       error.response ? error.response.data : error.message
+//     );
+//     res.status(500).json({
+//       error: true,
+//       message: "Failed to generate text",
+//       details: error.response ? error.response.data : error.message,
+//     });
+//   }
+// });
+
+app.post("/generate-note", async (req, res) => {
+  const { prompt } = req.body;
+
+  try {
+    const response = await axios.post(
+      "https://api-inference.huggingface.co/models/gpt2",
+      { inputs: prompt },
+      {
+        headers: {
+          Authorization: `Bearer ${HUGGING_FACE_API_KEY}`,
+        },
+      }
+    );
+    res.status(200).json(response.data);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error generating text", error: error.message });
+  }
+});
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 

@@ -188,7 +188,7 @@ const Home = () => {
               imgSrc={EmptyNote}
               message={`Start creating your first note! Click the 'Add' button to note down your thoughts, ideas, and reminders. Let's get started!`}
             />
-            {/*<AnimationComponent />*/}
+            {/* <AnimationComponent /> */}
           </>
         )}
       </div>

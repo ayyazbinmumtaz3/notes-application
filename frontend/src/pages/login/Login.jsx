@@ -91,13 +91,13 @@ const Login = () => {
               {isLoading ? "Logging in..." : "Login"}
             </button>
             <p className="text-sm text-center mt-4">
-              Not registered yet?{" "}
+              Not registered yet?
               <Link to="/signUp" className="font-medium text-primary underline">
                 Create an Account
               </Link>
             </p>
-            <div className="flex flex-col">
-              <hr className="my-6 w-[80%]" />
+            <div className="flex flex-col justify-center items-center">
+              <hr className="my-6 w-[100%]" />
               <GoogleLogin
                 onSuccess={handleGoogleSignIn}
                 onError={() => {
