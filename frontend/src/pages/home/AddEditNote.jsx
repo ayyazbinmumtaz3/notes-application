@@ -10,11 +10,26 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  // get generated note
+
+  const generatedNote = async () => {
+    try {
+      const prompt = title;
+      const response = await axiosInstance.post(`/generate-note`, { prompt });
+      const content = response.data.completion.generated_text;
+      console.log(content);
+    } catch (error) {
+      console.error(
+        "Error in generate note:",
+        error.response ? error.response.data : error
+      );
+    }
+  };
+
   // add notes
   const addNewNote = async () => {
     setIsLoading(true);
     try {
-      //
       const response = await axiosInstance.post("/add-note", {
         title,
         content,
@@ -89,6 +104,14 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
     }
   };
 
+  const generateNote = () => {
+    if (!title) {
+      setError("Please enter the title/prompt");
+      return;
+    }
+    generatedNote(title);
+  };
+
   return (
     <div className="relative">
       <button
@@ -102,12 +125,15 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
         <input
           className="text-2xl text-slate-950 outline-none"
           type="text"
-          placeholder="Add title"
+          placeholder="Type title/prompt"
           value={title}
           onChange={({ target }) => {
             setTitle(target.value);
           }}
         />
+      </div>
+      <div>
+        <button onClick={generateNote}>Generate</button>
       </div>
       <div className="flex flex-col gap-2 mt-4">
         <label className="input-label">Content</label>

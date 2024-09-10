@@ -20,8 +20,8 @@ const Home = () => {
     data: null,
   });
 
-  const [userInfo, setUserInfo] = useState(null);
   const navigate = useNavigate();
+  const [userInfo, setUserInfo] = useState(null);
   const [allNotes, setAllNotes] = useState([]);
   const [loading, setLoading] = useState(true);
 
