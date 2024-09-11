@@ -9,6 +9,7 @@ const { authenticateToken } = require("./utilities");
 const { OAuth2Client } = require("google-auth-library");
 const axios = require("axios");
 const { HfInference } = require("@huggingface/inference");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 mongoose.connect(config.connectionString);
 
@@ -25,21 +26,21 @@ app.use(
 
 app.post("/generate-note", authenticateToken, async (req, res) => {
   const { prompt } = req.body;
-  const token = process.env.HUGGINGFACE_ACCESS_TOKEN;
+  const apiKey = process.env.GOOGLE_API_KEY;
 
   if (!prompt || typeof prompt !== "string") {
     return res.status(400).json({ error: "Prompt is required" });
   }
 
-  const huggingFace = new HfInference(token);
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-1.5-flash",
+  });
 
   try {
-    const completion = await huggingFace.textGeneration({
-      model: "mistralai/Mixtral-8x7B-Instruct-v0.1",
-      inputs: prompt,
-      parameters: { max_new_tokens: 250 },
-    });
-    return res.status(200).json({ ok: true, completion });
+    const result = await model.generateContent(prompt);
+    const genResult = result.response.candidates[0].content.parts[0].text;
+    return res.status(200).json({ ok: true, result: genResult });
   } catch (err) {
     return res.status(500).json({ ok: false, err });
   }

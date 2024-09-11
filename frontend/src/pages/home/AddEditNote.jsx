@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { CloseIcon } from "../../assets/icons";
+import { CloseIcon, Regenerate } from "../../assets/icons";
 import TagInput from "../../components/input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
+import ReactMarkdown from "react-markdown";
 
 const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [title, setTitle] = useState(data?.title || "");
@@ -9,20 +10,26 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [tags, setTags] = useState(data?.tags || []);
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // get generated note
 
   const generatedNote = async () => {
+    setIsGenerating(true);
     try {
       const prompt = title;
       const response = await axiosInstance.post(`/generate-note`, { prompt });
-      const content = response.data.completion.generated_text;
-      console.log(content);
+      console.log(response.data.result);
+      setContent(response.data.result);
+      setError(null);
     } catch (error) {
       console.error(
         "Error in generate note:",
         error.response ? error.response.data : error
       );
+      setError("Failed to generate note");
+    } finally {
+      setIsGenerating(false);
     }
   };
 
@@ -105,11 +112,16 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   };
 
   const generateNote = () => {
-    if (!title) {
-      setError("Please enter the title/prompt");
-      return;
-    }
     generatedNote(title);
+  };
+
+  const regenerateNote = () => {
+    generatedNote();
+  };
+
+  const rotateStyle = {
+    transition: "transform 0.5s linear",
+    transform: isGenerating ? "rotate(360deg)" : "rotate(0deg)",
   };
 
   return (
@@ -132,12 +144,28 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
           }}
         />
       </div>
-      <div>
-        <button onClick={generateNote}>Generate</button>
+      <div className="flex items-center gap-3">
+        <button
+          className="border border-slate-600 my-3 p-2 rounded-md font-medium text-slate-600"
+          onClick={generateNote}
+          disabled={isGenerating}
+        >
+          {isGenerating ? "Generating..." : "Generate"}
+        </button>
+
+        <Regenerate
+          className="text-slate-600"
+          onClick={regenerateNote}
+          disabled={isGenerating}
+          style={rotateStyle}
+        />
       </div>
       <div className="flex flex-col gap-2 mt-4">
         <label className="input-label">Content</label>
-        <textarea
+        <ReactMarkdown className="p-2 bg-slate-50 rounded outline-none h-60 overflow-y-auto">
+          {content}
+        </ReactMarkdown>
+        {/* <textarea
           className="text-sm text-slate-950 outline-none p-2 rounded bg-slate-50"
           type="text"
           placeholder="Add content"
@@ -146,7 +174,7 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
           onChange={({ target }) => {
             setContent(target.value);
           }}
-        />
+        /> */}
       </div>
       <div>
         <label className="input-label">Tags</label>
