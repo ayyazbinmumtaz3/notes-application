@@ -1,5 +1,5 @@
 import dayjs from "dayjs";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import Modal from "react-modal";
 import { useNavigate } from "react-router-dom";
 import { AddButton } from "../../assets/icons";
@@ -20,6 +20,7 @@ const Home = () => {
     data: null,
   });
 
+  const modalRef = useRef(null);
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState(null);
   const [allNotes, setAllNotes] = useState([]);
@@ -120,6 +121,10 @@ const Home = () => {
     getUserInfo();
   }, []);
 
+  const handleCloseModal = () => {
+    setOpenEditModal({ isShown: false, type: "add", data: null });
+  };
+
   return (
     <>
       <Navbar
@@ -208,7 +213,8 @@ const Home = () => {
 
       <Modal
         isOpen={OpenEditModal.isShown}
-        onRequestClose={() => {}}
+        // Call handleCloseModal when the overlay is clicked
+        onRequestClose={handleCloseModal}
         style={{
           overlay: { backgroundColor: "rgba(0,0,0,0.2)", zIndex: 1000 },
           content: { zIndex: 1100 },
@@ -216,14 +222,15 @@ const Home = () => {
         className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-16 p-5 overflow-auto outline-none relative"
         appElement={document.getElementById("root")}
       >
-        <AddEditNote
-          getAllNotes={getAllNotes}
-          type={OpenEditModal.type}
-          data={OpenEditModal.data}
-          onClose={() =>
-            setOpenEditModal({ isShown: false, type: "add", data: null })
-          }
-        />
+        {/* Ref to the modal content */}
+        <div ref={modalRef}>
+          <AddEditNote
+            getAllNotes={getAllNotes}
+            type={OpenEditModal.type}
+            data={OpenEditModal.data}
+            onClose={handleCloseModal}
+          />
+        </div>
       </Modal>
     </>
   );

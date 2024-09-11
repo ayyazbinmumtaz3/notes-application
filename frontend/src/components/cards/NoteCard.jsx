@@ -17,8 +17,8 @@ const NoteCard = ({
         <div className="basis-full cursor-pointer" onClick={onEdit}>
           <h6 className="text-base font-medium">{title}</h6>
           <p className="text-[11px] text-slate-400">Created {date}</p>
-          <div className="text-sm text-slate-700 mt-2">
-            <ReactMarkdown className="line-clamp-4 max-w-[340px]">
+          <div className="text-sm text-slate-700 mt-2 overflow-hidden">
+            <ReactMarkdown className="line-clamp-4 max-w-sm">
               {content}
             </ReactMarkdown>
           </div>

@@ -1,8 +1,8 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { CloseIcon, Regenerate } from "../../assets/icons";
 import TagInput from "../../components/input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
-import ReactMarkdown from "react-markdown";
 
 const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [title, setTitle] = useState(data?.title || "");
@@ -150,32 +150,31 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
           onClick={generateNote}
           disabled={isGenerating}
         >
-          {isGenerating ? "Generating..." : "Generate"}
+          {isGenerating ? "Generating" : "Generate"}
         </button>
 
         <Regenerate
-          className="text-slate-600"
+          className="text-slate-600 cursor-pointer"
           onClick={regenerateNote}
           disabled={isGenerating}
           style={rotateStyle}
         />
       </div>
       <div className="flex flex-col gap-2 mt-4">
-        <label className="input-label">Content</label>
-        <ReactMarkdown className="p-2 bg-slate-50 rounded outline-none h-60 overflow-y-auto">
+        <label className="input-label">AI Generated Content</label>
+        <ReactMarkdown className="max-h-[250px] overflow-y-auto p-2 rounded">
           {content}
         </ReactMarkdown>
-        {/* <textarea
-          className="text-sm text-slate-950 outline-none p-2 rounded bg-slate-50"
-          type="text"
-          placeholder="Add content"
-          rows={10}
+        <label className="input-label">Add/Edit Note</label>
+        <textarea
+          className="text-sm text-slate-700 outline-none p-2 rounded bg-slate-50 h-60"
+          placeholder="Add your note here"
           value={content}
-          onChange={({ target }) => {
-            setContent(target.value);
-          }}
-        /> */}
+          onChange={({ target }) => setContent(target.value)}
+          rows={10}
+        />
       </div>
+
       <div>
         <label className="input-label">Tags</label>
         <TagInput tags={tags} setTags={setTags} />
