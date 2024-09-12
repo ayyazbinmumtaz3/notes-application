@@ -1,8 +1,11 @@
-import { useState } from "react";
-import ReactMarkdown from "react-markdown";
+import React, { useState } from "react";
+// import ReactMarkdown from "react-markdown";
 import { CloseIcon, Regenerate } from "../../assets/icons";
 import TagInput from "../../components/input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
+import TextEditor from "../../components/texteditor/TextEditor";
+import { MDXEditor, headingsPlugin } from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
 
 const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [title, setTitle] = useState(data?.title || "");
@@ -13,7 +16,6 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [isGenerating, setIsGenerating] = useState(false);
 
   // get generated note
-
   const generatedNote = async () => {
     setIsGenerating(true);
     try {
@@ -162,10 +164,12 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
       </div>
       <div className="flex flex-col gap-2 mt-4">
         <label className="input-label">AI Generated Content</label>
-        <ReactMarkdown className="max-h-[250px] overflow-y-auto p-2 rounded">
+        {/* <ReactMarkdown className="max-h-[250px] overflow-y-auto p-2 rounded">
           {content}
-        </ReactMarkdown>
+        </ReactMarkdown> */}
         <label className="input-label">Add/Edit Note</label>
+        {/* <TextEditor /> */}
+        <MDXEditor markdown={"# Hello World"} plugins={[headingsPlugin()]} />
         <textarea
           className="text-sm text-slate-700 outline-none p-2 rounded bg-slate-50 h-60"
           placeholder="Add your note here"
