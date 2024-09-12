@@ -31,4 +31,25 @@
   .input-label {
     @apply text-xs text-slate-400;
   }
+  
+  .mdx-editor::-webkit-scrollbar {
+    width: 6px; /* Adjust the width of the scrollbar */
+  }
+  
+  .mdx-editor::-webkit-scrollbar-track {
+    background: transparent; /* Scrollbar track */
+  }
+  
+  .mdx-editor::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.2); /* Scrollbar thumb */
+    border-radius: 10px;
+  }
+
+  .prose {
+    font-family: "Inter", sans-serif;
+  }
+  
+  .prose strong {
+    font-weight: 600;
+  }
 }

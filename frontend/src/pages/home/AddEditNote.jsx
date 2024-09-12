@@ -1,11 +1,32 @@
+import {
+  AdmonitionDirectiveDescriptor,
+  BoldItalicUnderlineToggles,
+  codeBlockPlugin,
+  codeMirrorPlugin,
+  CodeToggle,
+  CreateLink,
+  directivesPlugin,
+  headingsPlugin,
+  InsertCodeBlock,
+  InsertTable,
+  linkDialogPlugin,
+  linkPlugin,
+  listsPlugin,
+  ListsToggle,
+  markdownShortcutPlugin,
+  MDXEditor,
+  quotePlugin,
+  Separator,
+  StrikeThroughSupSubToggles,
+  tablePlugin,
+  toolbarPlugin,
+  UndoRedo,
+} from "@mdxeditor/editor";
+import "@mdxeditor/editor/style.css";
 import React, { useState } from "react";
-// import ReactMarkdown from "react-markdown";
 import { CloseIcon, Regenerate } from "../../assets/icons";
 import TagInput from "../../components/input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
-import TextEditor from "../../components/texteditor/TextEditor";
-import { MDXEditor, headingsPlugin } from "@mdxeditor/editor";
-import "@mdxeditor/editor/style.css";
 
 const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [title, setTitle] = useState(data?.title || "");
@@ -14,6 +35,7 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [editorKey, setEditorKey] = useState(Date.now());
 
   // get generated note
   const generatedNote = async () => {
@@ -23,6 +45,7 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
       const response = await axiosInstance.post(`/generate-note`, { prompt });
       console.log(response.data.result);
       setContent(response.data.result);
+      setEditorKey(Date.now());
       setError(null);
     } catch (error) {
       console.error(
@@ -163,20 +186,61 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
         />
       </div>
       <div className="flex flex-col gap-2 mt-4">
-        <label className="input-label">AI Generated Content</label>
-        {/* <ReactMarkdown className="max-h-[250px] overflow-y-auto p-2 rounded">
-          {content}
-        </ReactMarkdown> */}
         <label className="input-label">Add/Edit Note</label>
-        {/* <TextEditor /> */}
-        <MDXEditor markdown={"# Hello World"} plugins={[headingsPlugin()]} />
-        <textarea
+        {/* <Markdown className="max-h-[30%]">{content}</Markdown>  */}
+        <MDXEditor
+          className="mdx-editor max-h-[300px] overflow-y-auto"
+          contentEditableClassName="prose"
+          key={editorKey}
+          markdown={content}
+          placeholder="Add your note here..."
+          onChange={(updatedContent) => setContent(updatedContent)}
+          plugins={[
+            toolbarPlugin({
+              toolbarContents: () => (
+                <>
+                  <UndoRedo />
+                  <Separator />
+                  <BoldItalicUnderlineToggles />
+                  <CodeToggle />
+                  <Separator />
+                  <StrikeThroughSupSubToggles />
+                  <Separator />
+                  <ListsToggle />
+                  <Separator />
+                  <InsertTable />
+                  <InsertCodeBlock />
+                  <CreateLink />
+                </>
+              ),
+            }),
+            directivesPlugin({
+              directiveDescriptors: [AdmonitionDirectiveDescriptor],
+            }),
+            listsPlugin(),
+            quotePlugin(),
+            headingsPlugin(),
+            linkPlugin(),
+            linkDialogPlugin(),
+            tablePlugin(),
+            codeBlockPlugin({ defaultCodeBlockLanguage: "js" }),
+            codeMirrorPlugin({
+              codeBlockLanguages: {
+                js: "JavaScript",
+                css: "CSS",
+                tsx: "TypeScript",
+              },
+            }),
+            markdownShortcutPlugin(),
+          ]}
+        />
+        {/* <textarea
           className="text-sm text-slate-700 outline-none p-2 rounded bg-slate-50 h-60"
           placeholder="Add your note here"
           value={content}
           onChange={({ target }) => setContent(target.value)}
           rows={10}
-        />
+        /> */}
       </div>
 
       <div>

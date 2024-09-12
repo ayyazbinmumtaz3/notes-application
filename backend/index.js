@@ -1,15 +1,14 @@
 const cors = require("cors");
 const express = require("express");
 const app = express();
-require("dotenv").config();
 const config = require("./config.json");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utilities");
 const { OAuth2Client } = require("google-auth-library");
 const axios = require("axios");
-const { HfInference } = require("@huggingface/inference");
 const { GoogleGenerativeAI } = require("@google/generative-ai");
+require("dotenv").config();
 
 mongoose.connect(config.connectionString);
 

@@ -1,4 +1,3 @@
-import ReactMarkdown from "react-markdown";
 import { PushPin, TrashBin } from "../../assets/icons";
 
 const NoteCard = ({
@@ -17,10 +16,8 @@ const NoteCard = ({
         <div className="basis-full cursor-pointer" onClick={onEdit}>
           <h6 className="text-base font-medium">{title}</h6>
           <p className="text-[11px] text-slate-400">Created {date}</p>
-          <div className="text-sm text-slate-700 mt-2 overflow-hidden">
-            <ReactMarkdown className="line-clamp-4 max-w-sm">
-              {content}
-            </ReactMarkdown>
+          <div className="text-sm text-slate-700 mt-2 overflow-hidden line-clamp-4 max-w-xs">
+            {content}
           </div>
           <div className="flex text-xs gap-1 text-slate-500 flex-wrap">
             {tags.map((item) => (
