@@ -10,9 +10,13 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-markdown": "^6.2.5",
+    "@codemirror/language-data": "^6.5.1",
     "@mdxeditor/editor": "^3.11.3",
     "@react-oauth/google": "^0.12.1",
     "axios": "^1.7.2",
+    "codemirror": "^6.0.1",
     "dayjs": "^1.11.11",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.378.0",
@@ -20,6 +24,7 @@
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-icons": "^5.2.0",
+    "react-markdown": "^9.0.1",
     "react-modal": "^3.16.1",
     "react-router-dom": "^6.23.0",
     "two.js": "^0.8.14"

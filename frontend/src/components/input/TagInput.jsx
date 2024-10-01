@@ -57,10 +57,10 @@ const TagInput = ({ tags, setTags }) => {
           onKeyDown={handleKeyDown}
         />
         <button
-          className="w-8 h-8 flex items-center justify-center rounded border border-blue-700 hover:bg-blue-700"
+          className="w-8 h-8 flex items-center justify-center rounded border border-slate-300 hover:bg-slate-100"
           onClick={addNewTag}
         >
-          <AddButton className="text-2xl text-blue-700 hover:text-white" />
+          <AddButton className="text-2xl text-slate-500" />
         </button>
       </div>
     </>

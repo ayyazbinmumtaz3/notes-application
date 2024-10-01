@@ -7,7 +7,12 @@ const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utilities");
 const { OAuth2Client } = require("google-auth-library");
 const axios = require("axios");
-const { GoogleGenerativeAI } = require("@google/generative-ai");
+const {
+  GoogleGenerativeAI,
+  HarmCategory,
+  HarmBlockThreshold,
+} = require("@google/generative-ai");
+
 require("dotenv").config();
 
 mongoose.connect(config.connectionString);
@@ -25,15 +30,36 @@ app.use(
 
 app.post("/generate-note", authenticateToken, async (req, res) => {
   const { prompt } = req.body;
-  const apiKey = process.env.GOOGLE_API_KEY;
 
   if (!prompt || typeof prompt !== "string") {
     return res.status(400).json({ error: "Prompt is required" });
   }
 
+  const safetySettings = [
+    {
+      category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+    {
+      category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+      threshold: HarmBlockThreshold.BLOCK_NONE,
+    },
+  ];
+
+  const apiKey = process.env.GOOGLE_API_KEY;
   const genAI = new GoogleGenerativeAI(apiKey);
+
   const model = genAI.getGenerativeModel({
     model: "gemini-1.5-flash",
+    safetySettings: safetySettings,
   });
 
   try {

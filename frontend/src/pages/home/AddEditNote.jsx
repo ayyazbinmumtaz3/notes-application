@@ -1,9 +1,11 @@
 import {
   AdmonitionDirectiveDescriptor,
   BoldItalicUnderlineToggles,
+  ChangeCodeMirrorLanguage,
   codeBlockPlugin,
   codeMirrorPlugin,
   CodeToggle,
+  ConditionalContents,
   CreateLink,
   directivesPlugin,
   headingsPlugin,
@@ -23,10 +25,13 @@ import {
   UndoRedo,
 } from "@mdxeditor/editor";
 import "@mdxeditor/editor/style.css";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { CloseIcon, Regenerate } from "../../assets/icons";
 import TagInput from "../../components/input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
+import { javascript } from "@codemirror/lang-javascript";
+import { python } from "@codemirror/lang-python";
+import { css } from "@codemirror/lang-css";
 
 const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [title, setTitle] = useState(data?.title || "");
@@ -35,7 +40,15 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [editorKey, setEditorKey] = useState(Date.now());
+  // const [editorKey, setEditorKey] = useState(Date.now());
+
+  const mdxEditorRef = React.useRef(null);
+
+  // const javascriptRegex = /(javascript|js)/i;
+
+  useEffect(() => {
+    mdxEditorRef.current?.setMarkdown(data?.content || "");
+  }, [data]);
 
   // get generated note
   const generatedNote = async () => {
@@ -43,9 +56,10 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
     try {
       const prompt = title;
       const response = await axiosInstance.post(`/generate-note`, { prompt });
-      console.log(response.data.result);
+      console.log(response.data.result, { mdxEditorRef });
+      mdxEditorRef.current?.setMarkdown(response.data.result);
       setContent(response.data.result);
-      setEditorKey(Date.now());
+      // setEditorKey(Date.now());
       setError(null);
     } catch (error) {
       console.error(
@@ -157,44 +171,49 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
       >
         <CloseIcon className="text-xl text-slate-800" />
       </button>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col">
         <label className="input-label">Title</label>
-        <input
-          className="text-2xl text-slate-950 outline-none"
-          type="text"
-          placeholder="Type title/prompt"
-          value={title}
-          onChange={({ target }) => {
-            setTitle(target.value);
-          }}
-        />
+        <div className="flex justify-between items-center">
+          <input
+            className="text-2xl text-slate-950 w-[45rem] p-2 rounded-md border border-gray-50 600 outline-none"
+            type="text"
+            placeholder="Type title/prompt"
+            value={title}
+            onChange={({ target }) => {
+              setTitle(target.value);
+            }}
+          />
+          <div className="flex items-center gap-3">
+            <button
+              className="border border-slate-200 hover:bg-gray-100 my-3 p-2 rounded-md font-medium text-slate-500"
+              onClick={generateNote}
+              disabled={isGenerating}
+            >
+              {isGenerating ? "Generating" : "Generate"}
+            </button>
+            <Regenerate
+              className="text-slate-500 cursor-pointer"
+              onClick={regenerateNote}
+              disabled={isGenerating}
+              style={rotateStyle}
+            />
+          </div>
+        </div>
       </div>
-      <div className="flex items-center gap-3">
-        <button
-          className="border border-slate-600 my-3 p-2 rounded-md font-medium text-slate-600"
-          onClick={generateNote}
-          disabled={isGenerating}
-        >
-          {isGenerating ? "Generating" : "Generate"}
-        </button>
-
-        <Regenerate
-          className="text-slate-600 cursor-pointer"
-          onClick={regenerateNote}
-          disabled={isGenerating}
-          style={rotateStyle}
-        />
-      </div>
-      <div className="flex flex-col gap-2 mt-4">
+      <div className="flex flex-col gap-2 my-2">
         <label className="input-label">Add/Edit Note</label>
-        {/* <Markdown className="max-h-[30%]">{content}</Markdown>  */}
+        {/* <Markdown className="max-h-[300px]">{content}</Markdown> */}
         <MDXEditor
+          ref={mdxEditorRef}
           className="mdx-editor max-h-[300px] overflow-y-auto"
           contentEditableClassName="prose"
-          key={editorKey}
+          // key={editorKey}
           markdown={content}
           placeholder="Add your note here..."
-          onChange={(updatedContent) => setContent(updatedContent)}
+          onChange={(updatedContent) => {
+            setContent(updatedContent);
+            mdxEditorRef.current?.setMarkdown(updatedContent);
+          }}
           plugins={[
             toolbarPlugin({
               toolbarContents: () => (
@@ -209,8 +228,19 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
                   <ListsToggle />
                   <Separator />
                   <InsertTable />
-                  <InsertCodeBlock />
                   <CreateLink />
+                  {/* <ConditionalContents
+                    options={[
+                      {
+                        when: (editor) => editor?.editorType === "codeblock",
+                        contents: () => <ChangeCodeMirrorLanguage />,
+                      },
+
+                      {
+                        fallback: () => <InsertCodeBlock />,
+                      },
+                    ]}
+                  /> */}
                 </>
               ),
             }),
@@ -226,11 +256,63 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
             codeBlockPlugin({ defaultCodeBlockLanguage: "js" }),
             codeMirrorPlugin({
               codeBlockLanguages: {
-                js: "JavaScript",
+                javascript: "JavaScript",
+                typescript: "TypeScript",
+                jsx: "JSX",
+                tsx: "TSX",
+                html: "HTML",
                 css: "CSS",
-                tsx: "TypeScript",
+                scss: "SCSS",
+                less: "LESS",
+                xml: "XML",
+                json: "JSON",
+                yaml: "YAML",
+                markdown: "Markdown",
+                python: "Python",
+                ruby: "Ruby",
+                php: "PHP",
+                java: "Java",
+                kotlin: "Kotlin",
+                c: "C",
+                cpp: "C++",
+                csharp: "C#",
+                go: "Go",
+                rust: "Rust",
+                swift: "Swift",
+                dart: "Dart",
+                r: "R",
+                shell: "Shell",
+                bash: "Bash",
+                powershell: "Powershell",
+                perl: "Perl",
+                lua: "Lua",
+                sql: "SQL",
+                plsql: "PL/SQL",
+                visualbasic: "Visual Basic",
+                assembly: "Assembly",
+                scala: "Scala",
+                groovy: "Groovy",
+                clojure: "Clojure",
+                fsharp: "F#",
+                elixir: "Elixir",
+                haskell: "Haskell",
+                erlang: "Erlang",
+                matlab: "MATLAB",
+                tex: "TeX",
+                latex: "LaTeX",
+                dockerfile: "Dockerfile",
+                ini: "INI",
+                toml: "TOML",
+                graphql: "GraphQL",
+                sass: "SASS",
+                protobuf: "Protocol Buffers",
+                thrift: "Thrift",
+                haxe: "Haxe",
+                zig: "Zig",
               },
+              autoLoadLanguageSupport: true,
             }),
+
             markdownShortcutPlugin(),
           ]}
         />
@@ -243,13 +325,13 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
         /> */}
       </div>
 
-      <div>
+      <div className="mt-4">
         <label className="input-label">Tags</label>
         <TagInput tags={tags} setTags={setTags} />
       </div>
       {error && <p className="text-red-500 text-xs pt-4">{error}</p>}
       <button
-        className="btn-primary font-medium mt-5 p-3"
+        className="text-gray-900 text-lg bg-neutral-200 hover:bg-neutral-300 rounded-md w-full font-medium mt-5 p-3"
         onClick={() => {
           handleAddNote();
         }}

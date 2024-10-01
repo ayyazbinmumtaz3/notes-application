@@ -1,3 +1,4 @@
+import ReactMarkdown from "react-markdown";
 import { PushPin, TrashBin } from "../../assets/icons";
 
 const NoteCard = ({
@@ -11,15 +12,19 @@ const NoteCard = ({
   onEdit,
 }) => {
   return (
-    <div className="border rounded-md p-4 bg-white hover:shadow-xl transition-all ease-in-out">
+    <div className="border rounded-md p-4 bg-white hover:border-slate-300 hover:shadow-xl transition-all ease-in-out">
       <div className="flex justify-between gap-2">
         <div className="basis-full cursor-pointer" onClick={onEdit}>
-          <h6 className="text-base font-medium">{title}</h6>
+          <h6 className="text-base font-medium line-clamp-1 max-w-xs">
+            {title}
+          </h6>
           <p className="text-[11px] text-slate-400">Created {date}</p>
-          <div className="text-sm text-slate-700 mt-2 overflow-hidden line-clamp-4 max-w-xs">
-            {content}
+          <div className="text-sm text-slate-700 mt-2 overflow-hidden">
+            <ReactMarkdown className="line-clamp-5 max-w-xs">
+              {content}
+            </ReactMarkdown>
           </div>
-          <div className="flex text-xs gap-1 text-slate-500 flex-wrap">
+          <div className="flex text-xs gap-1 mt-2 text-slate-500 flex-wrap">
             {tags.map((item) => (
               <span key={item} className="tag">
                 #{item}

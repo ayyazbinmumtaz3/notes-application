@@ -130,17 +130,13 @@ const Home = () => {
       <Navbar
         userInfo={userInfo}
         onSearchNotes={getAllNotes}
-        className="relative z-50"
+        className="relative"
       />
 
       <div className="container mx-auto my-6">
         {loading ? (
-          <div className="relative h-screen">
-            <img
-              src={Skeleton}
-              alt="Skeleton"
-              className="absolute left-1/2 bottom-1/2"
-            />
+          <div className="flex justify-center my-40">
+            <img src={Skeleton} alt="Skeleton" className="" />
           </div>
         ) : allNotes.length > 0 ? (
           <>
@@ -213,16 +209,13 @@ const Home = () => {
 
       <Modal
         isOpen={OpenEditModal.isShown}
-        // Call handleCloseModal when the overlay is clicked
         onRequestClose={handleCloseModal}
         style={{
-          overlay: { backgroundColor: "rgba(0,0,0,0.2)", zIndex: 1000 },
-          content: { zIndex: 1100 },
+          overlay: { backgroundColor: "rgba(0,0,0,0.3)" },
         }}
-        className="w-[40%] max-h-3/4 bg-white rounded-md mx-auto mt-16 p-5 overflow-auto outline-none relative"
+        className="w-[70%] max-h-[3/4] bg-white rounded-md mx-auto mt-20 p-5 overflow-auto outline-none relative"
         appElement={document.getElementById("root")}
       >
-        {/* Ref to the modal content */}
         <div ref={modalRef}>
           <AddEditNote
             getAllNotes={getAllNotes}
