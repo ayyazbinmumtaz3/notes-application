@@ -1,16 +1,18 @@
 import {
   AdmonitionDirectiveDescriptor,
+  BlockTypeSelect,
   BoldItalicUnderlineToggles,
-  ChangeCodeMirrorLanguage,
   codeBlockPlugin,
   codeMirrorPlugin,
   CodeToggle,
-  ConditionalContents,
   CreateLink,
   directivesPlugin,
   headingsPlugin,
-  InsertCodeBlock,
+  imagePlugin,
+  InsertAdmonition,
+  InsertImage,
   InsertTable,
+  InsertThematicBreak,
   linkDialogPlugin,
   linkPlugin,
   listsPlugin,
@@ -18,9 +20,11 @@ import {
   markdownShortcutPlugin,
   MDXEditor,
   quotePlugin,
+  realmPlugin,
   Separator,
   StrikeThroughSupSubToggles,
   tablePlugin,
+  thematicBreakPlugin,
   toolbarPlugin,
   UndoRedo,
 } from "@mdxeditor/editor";
@@ -29,9 +33,7 @@ import React, { useEffect, useState } from "react";
 import { CloseIcon, Regenerate } from "../../assets/icons";
 import TagInput from "../../components/input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
-import { javascript } from "@codemirror/lang-javascript";
-import { python } from "@codemirror/lang-python";
-import { css } from "@codemirror/lang-css";
+import ReactMarkdown from "react-markdown";
 
 const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [title, setTitle] = useState(data?.title || "");
@@ -202,17 +204,18 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
       </div>
       <div className="flex flex-col gap-2 my-2">
         <label className="input-label">Add/Edit Note</label>
-        {/* <Markdown className="max-h-[300px]">{content}</Markdown> */}
+        {/* <ReactMarkdown className="max-h-[300px]">{content}</ReactMarkdown> */}
         <MDXEditor
           ref={mdxEditorRef}
-          className="mdx-editor max-h-[300px] overflow-y-auto"
           contentEditableClassName="prose"
+          className="px-2 mdx-editor max-h-[300px] overflow-y-auto"
           // key={editorKey}
           markdown={content}
           placeholder="Add your note here..."
           onChange={(updatedContent) => {
             setContent(updatedContent);
             mdxEditorRef.current?.setMarkdown(updatedContent);
+            // console.log("Updated Content:", updatedContent);
           }}
           plugins={[
             toolbarPlugin({
@@ -223,11 +226,15 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
                   <BoldItalicUnderlineToggles />
                   <CodeToggle />
                   <Separator />
+                  <BlockTypeSelect />
                   <StrikeThroughSupSubToggles />
                   <Separator />
                   <ListsToggle />
                   <Separator />
                   <InsertTable />
+                  <InsertAdmonition />
+                  <InsertThematicBreak />
+                  <InsertImage />
                   <CreateLink />
                   {/* <ConditionalContents
                     options={[
@@ -244,16 +251,20 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
                 </>
               ),
             }),
+            headingsPlugin(),
             directivesPlugin({
               directiveDescriptors: [AdmonitionDirectiveDescriptor],
             }),
             listsPlugin(),
+            imagePlugin(),
             quotePlugin(),
-            headingsPlugin(),
+            realmPlugin(),
             linkPlugin(),
             linkDialogPlugin(),
+            thematicBreakPlugin(),
             tablePlugin(),
-            codeBlockPlugin({ defaultCodeBlockLanguage: "js" }),
+            thematicBreakPlugin(),
+            codeBlockPlugin({ defaultCodeBlockLanguage: "txt" }),
             codeMirrorPlugin({
               codeBlockLanguages: {
                 javascript: "JavaScript",
@@ -316,13 +327,6 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
             markdownShortcutPlugin(),
           ]}
         />
-        {/* <textarea
-          className="text-sm text-slate-700 outline-none p-2 rounded bg-slate-50 h-60"
-          placeholder="Add your note here"
-          value={content}
-          onChange={({ target }) => setContent(target.value)}
-          rows={10}
-        /> */}
       </div>
 
       <div className="mt-4">
