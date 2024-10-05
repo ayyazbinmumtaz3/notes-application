@@ -213,7 +213,7 @@ const Home = () => {
         style={{
           overlay: { backgroundColor: "rgba(0,0,0,0.3)" },
         }}
-        className="w-[70%] max-h-[3/4] bg-white rounded-md mx-auto mt-20 p-5 overflow-auto outline-none relative"
+        className="w-[70%] max-h-[80dvh] bg-white rounded-md mx-auto mt-20 p-5 overflow-auto outline-none relative"
         appElement={document.getElementById("root")}
       >
         <div ref={modalRef}>

@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utilities");
 const { OAuth2Client } = require("google-auth-library");
+const bcrypt = require("bcrypt");
 const axios = require("axios");
 const {
   GoogleGenerativeAI,
@@ -132,7 +133,9 @@ app.post("/create-account", async (req, res) => {
     });
   }
 
-  const user = new User({ fullName, email, password });
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+  const user = new User({ fullName, email, password: hashedPassword });
 
   await user.save();
 
@@ -167,7 +170,9 @@ app.post("/login", async (req, res) => {
       .json({ error: true, message: "User does not exist" });
   }
 
-  if (userInfo.email == email && userInfo.password == password) {
+  const isMatch = await bcrypt.compare(password, userInfo.password);
+
+  if (userInfo.email == email && isMatch) {
     const user = { user: userInfo };
     const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
       expiresIn: "1y",

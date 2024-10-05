@@ -48,6 +48,7 @@
 
   .prose {
     font-family: "Inter", sans-serif;
+    max-width: 100%;
   }
   
   .prose strong {

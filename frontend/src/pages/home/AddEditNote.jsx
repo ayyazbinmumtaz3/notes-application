@@ -42,11 +42,8 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [error, setError] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  // const [editorKey, setEditorKey] = useState(Date.now());
 
   const mdxEditorRef = React.useRef(null);
-
-  // const javascriptRegex = /(javascript|js)/i;
 
   useEffect(() => {
     mdxEditorRef.current?.setMarkdown(data?.content || "");
@@ -61,7 +58,6 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
       console.log(response.data.result, { mdxEditorRef });
       mdxEditorRef.current?.setMarkdown(response.data.result);
       setContent(response.data.result);
-      // setEditorKey(Date.now());
       setError(null);
     } catch (error) {
       console.error(
@@ -209,13 +205,11 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
           ref={mdxEditorRef}
           contentEditableClassName="prose"
           className="px-2 mdx-editor max-h-[300px] overflow-y-auto"
-          // key={editorKey}
           markdown={content}
           placeholder="Add your note here..."
           onChange={(updatedContent) => {
             setContent(updatedContent);
             mdxEditorRef.current?.setMarkdown(updatedContent);
-            // console.log("Updated Content:", updatedContent);
           }}
           plugins={[
             toolbarPlugin({
