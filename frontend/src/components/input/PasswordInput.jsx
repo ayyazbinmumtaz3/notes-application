@@ -7,7 +7,7 @@ const PasswordInput = ({ value, onChange, placeholder }) => {
     setIsShowPassword(!isShowPassword);
   };
   return (
-    <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded mb-3">
+    <div className="flex items-center bg-transparent border-[1.5px] px-5 rounded mb-3 select-none">
       <input
         value={value}
         onChange={onChange}
@@ -18,7 +18,7 @@ const PasswordInput = ({ value, onChange, placeholder }) => {
       {isShowPassword ? (
         <FaRegEye
           size={22}
-          className="text-primary cursor-pointer"
+          className="text-slate-400 cursor-pointer"
           onClick={toggleShowPassword}
         />
       ) : (

@@ -1,6 +1,5 @@
+import { Pin, PinOff, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { PushPin, TrashBin } from "../../assets/icons";
-import { PinOff } from "lucide-react";
 
 const NoteCard = ({
   title,
@@ -13,7 +12,7 @@ const NoteCard = ({
   onEdit,
 }) => {
   return (
-    <div className="border rounded-md p-4 bg-[#edede9] hover:border-slate-300 hover:shadow-xl transition-all ease-in-out">
+    <div className="border rounded-md p-4 bg-[#f8f9fa] hover:border-slate-300 hover:shadow-xl transition-all ease-in-out">
       <div className="flex justify-between gap-2">
         <div className="basis-full cursor-pointer" onClick={onEdit}>
           <h6 className="text-base font-medium line-clamp-1 max-w-xs">
@@ -35,7 +34,7 @@ const NoteCard = ({
         </div>
         <div className="flex flex-col justify-between">
           {isPinned ? (
-            <PushPin
+            <Pin
               size={24}
               className={`icon-btn ${
                 isPinned ? "text-primary" : "text-slate-300"
@@ -54,7 +53,7 @@ const NoteCard = ({
             />
           )}
 
-          <TrashBin
+          <Trash2
             className="icon-btn hover:text-gray-500"
             onClick={onDelete}
             aria-label="Delete note"

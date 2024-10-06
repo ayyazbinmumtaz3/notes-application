@@ -2,14 +2,17 @@ import {
   AdmonitionDirectiveDescriptor,
   BlockTypeSelect,
   BoldItalicUnderlineToggles,
+  ChangeCodeMirrorLanguage,
   codeBlockPlugin,
   codeMirrorPlugin,
   CodeToggle,
+  ConditionalContents,
   CreateLink,
   directivesPlugin,
   headingsPlugin,
   imagePlugin,
   InsertAdmonition,
+  InsertCodeBlock,
   InsertImage,
   InsertTable,
   InsertThematicBreak,
@@ -33,6 +36,7 @@ import React, { useEffect, useState } from "react";
 import { CloseIcon, Regenerate } from "../../assets/icons";
 import TagInput from "../../components/input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
+import ReactMarkdown from "react-markdown";
 
 const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [title, setTitle] = useState(data?.title || "");
@@ -199,7 +203,9 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
       </div>
       <div className="flex flex-col gap-2 my-2">
         <label className="input-label">Add/Edit Note</label>
-        {/* <ReactMarkdown className="max-h-[300px]">{content}</ReactMarkdown> */}
+        <ReactMarkdown className="max-h-[400px] line-clamp-6">
+          {content}
+        </ReactMarkdown>
         <MDXEditor
           ref={mdxEditorRef}
           contentEditableClassName="prose"
@@ -257,7 +263,7 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
             thematicBreakPlugin(),
             tablePlugin(),
             thematicBreakPlugin(),
-            codeBlockPlugin({ defaultCodeBlockLanguage: "txt" }),
+            codeBlockPlugin({ defaultCodeBlockLanguage: "plaintext" }),
             codeMirrorPlugin({
               codeBlockLanguages: {
                 javascript: "JavaScript",

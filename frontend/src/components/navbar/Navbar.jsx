@@ -53,7 +53,7 @@ const Navbar = ({ userInfo, onSearchNotes }) => {
           setSearchQuery(target.value);
         }}
         handleSearch={() => {
-          debouncedSearch(searchQuery); // Ensure manual search still works
+          debouncedSearch(searchQuery);
         }}
         onClearSearch={onClearSearch}
       />

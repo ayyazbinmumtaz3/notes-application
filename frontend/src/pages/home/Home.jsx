@@ -132,8 +132,7 @@ const Home = () => {
         onSearchNotes={getAllNotes}
         className="relative"
       />
-
-      <div className="container mx-auto my-6">
+      <div className="container md:px-4 mx-auto my-6">
         {loading ? (
           <div className="flex justify-center my-40">
             <img src={Skeleton} alt="Skeleton" className="" />
