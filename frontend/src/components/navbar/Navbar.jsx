@@ -40,7 +40,7 @@ const Navbar = ({ userInfo, onSearchNotes }) => {
   };
 
   const onLogout = () => {
-    localStorage.clear();
+    localStorage.removeItem("token");
     navigate("/login");
   };
 

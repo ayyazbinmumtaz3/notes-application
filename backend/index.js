@@ -6,8 +6,7 @@ const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const { authenticateToken } = require("./utilities");
 const { OAuth2Client } = require("google-auth-library");
-const bcrypt = require("bcrypt");
-const axios = require("axios");
+const bcryptjs = require("bcryptjs");
 const {
   GoogleGenerativeAI,
   HarmCategory,
@@ -133,8 +132,8 @@ app.post("/create-account", async (req, res) => {
     });
   }
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password, salt);
+  const salt = await bcryptjs.genSalt(10);
+  const hashedPassword = await bcryptjs.hash(password, salt);
   const user = new User({ fullName, email, password: hashedPassword });
 
   await user.save();
@@ -170,7 +169,7 @@ app.post("/login", async (req, res) => {
       .json({ error: true, message: "User does not exist" });
   }
 
-  const isMatch = await bcrypt.compare(password, userInfo.password);
+  const isMatch = await bcryptjs.compare(password, userInfo.password);
 
   if (userInfo.email == email && isMatch) {
     const user = { user: userInfo };

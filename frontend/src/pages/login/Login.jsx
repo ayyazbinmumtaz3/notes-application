@@ -1,13 +1,11 @@
 import { GoogleLogin } from "@react-oauth/google";
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "../../auth/AuthContext";
 import PasswordInput from "../../components/input/PasswordInput";
 import axiosInstance from "../../utils/axiosInstance";
 import { validateEmail } from "../../utils/helper";
 
 const Login = () => {
-  const { setIsAuthenticated } = useContext(AuthContext);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -23,7 +21,6 @@ const Login = () => {
       });
 
       localStorage.setItem("token", result.data.token);
-      setIsAuthenticated(true);
       navigate("/dashboard");
     } catch (error) {
       console.error("Error during google signin", error);

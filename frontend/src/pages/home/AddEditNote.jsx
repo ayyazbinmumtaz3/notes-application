@@ -33,7 +33,6 @@ import React, { useEffect, useState } from "react";
 import { CloseIcon, Regenerate } from "../../assets/icons";
 import TagInput from "../../components/input/TagInput";
 import axiosInstance from "../../utils/axiosInstance";
-import ReactMarkdown from "react-markdown";
 
 const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
   const [title, setTitle] = useState(data?.title || "");
