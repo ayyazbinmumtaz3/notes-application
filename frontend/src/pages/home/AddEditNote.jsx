@@ -203,9 +203,9 @@ const AddEditNote = ({ data, getAllNotes, type, onClose }) => {
       </div>
       <div className="flex flex-col gap-2 my-2">
         <label className="input-label">Add/Edit Note</label>
-        <ReactMarkdown className="max-h-[400px] line-clamp-6">
+        {/* <ReactMarkdown className="max-h-[400px] line-clamp-6">
           {content}
-        </ReactMarkdown>
+        </ReactMarkdown> */}
         <MDXEditor
           ref={mdxEditorRef}
           contentEditableClassName="prose"

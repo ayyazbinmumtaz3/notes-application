@@ -14,7 +14,7 @@ const Navbar = ({ userInfo, onSearchNotes }) => {
     debounce(
       (query) => {
         if (query !== prevSearchQueryRef.current) {
-          console.log("Debounced search for:", query); // Debugging line
+          console.log("Debounced search for:", query);
           onSearchNotes(query);
           prevSearchQueryRef.current = query;
         }

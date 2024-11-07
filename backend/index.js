@@ -169,7 +169,7 @@ app.post("/login", async (req, res) => {
       .json({ error: true, message: "User does not exist" });
   }
 
-  const isMatch = await bcryptjs.compare(password, userInfo.password);
+  const isMatch = bcryptjs.compare(password, userInfo.password);
 
   if (userInfo.email == email && isMatch) {
     const user = { user: userInfo };
